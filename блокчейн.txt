@@ -1,0 +1,46 @@
+// SPDX-License-Identifier: GPL-3.0
+
+pragma solidity >=0.7.0 <0.9.0;
+contract avtosalon{
+    address public admin;
+    address owner1 = 0x583031D1113aD414F02576BD6afaBfb302140225;
+    address owner2 = 0xdD870fA1b7C4700F2BD7f44238821C26f7392148;
+
+    struct avto{
+        string gosNum;
+        string color;
+        bool status;
+    }
+    struct changeColor{
+        // string gosNum;
+        string color;
+        string price;
+    }
+    // avto[] public cars;
+
+    mapping(address => avto) public allCars;
+    mapping(address => changeColor) public changeColors;
+    
+    constructor(){
+        admin = msg.sender;
+        allCars[owner1] = avto("qwe", "green", true);
+        allCars[owner2] = avto("zxc", "red", true);
+
+    }
+    function inputCar(address owner,string memory gosNum, string memory color) public{
+        require(admin == msg.sender, "you not admin");
+        allCars[owner] = avto(gosNum, color, true);
+    }
+    function request(string memory color) public{
+        // require(keccak256(abi.encodePacked(allCars[msg.sender])) != keccak256(abi.encodePacked(" ")), "not your car");
+        changeColors[msg.sender].color = color;
+    }
+    function carValuetion(address owner,string memory price)public{
+        changeColors[owner].price = price;
+    }
+    function changeC(address owner) public payable{
+        require(msg.sender == admin, "you not admin");
+        allCars[owner].color = changeColors[owner].color;
+        allCars[owner].status = false;
+    }
+}
