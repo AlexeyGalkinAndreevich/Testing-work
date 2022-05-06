@@ -1,0 +1,138 @@
+// SPDX-License-Identifier: GPL-3.0
+
+pragma solidity >=0.7.0 <0.9.0;
+
+contract Flats{
+
+    struct flat{
+        address owner;
+        uint squer;
+        uint lifetime;
+        bool statuseOwner;
+
+    }
+
+    struct Request{
+
+        address owner;
+        uint idFlat;
+        uint price;
+        uint saleTerm;
+        bool statusRequest;
+        address buyer;
+        bool statusBuyer;
+        bool statuseAnswer;
+
+    }
+
+    struct Buyer{
+        address buyer;
+        uint priceBuyer;
+    }
+
+    address admin;
+
+    mapping (address => flat[]) bazaOwners;
+
+    Request[]requests;
+    Buyer[]massBuyer;
+
+    uint nowMoment = block.timestamp;
+
+    constructor(){
+
+        admin = 0x5B38Da6a701c568545dCfcB03FcB875f56beddC4;
+        bazaOwners[0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2].push(flat(0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2, 50, 7, true));
+        
+                   
+    }
+
+    function CreateRequest(uint idFlat, uint price, uint TimeActual)public{
+        require(bazaOwners[msg.sender].length > idFlat, "Error");
+        requests.push(Request(msg.sender, idFlat, price, nowMoment + (TimeActual * 24 *60**2), false, 0x0000000000000000000000000000000000000000,false, false));
+    }
+
+    function AddFlat(address owner, uint squer,uint lifetime)public{
+        require(msg.sender == admin, "You not admin");
+        bazaOwners[owner].push(flat(owner, squer, lifetime,true));
+    }
+
+    function purchase (uint idRequest)public payable{
+        require(msg.sender != requests[idRequest].owner, "you cannot sell the flat to yourself");
+        require(requests[idRequest].statusRequest == false, "Application closed");
+        require(requests[idRequest].saleTerm > nowMoment, "Application is not valid");
+
+        
+        require(msg.value >= requests[idRequest].price, "you offered a low price");
+        requests[idRequest].statusBuyer = true;
+        requests[idRequest].buyer = msg.sender;
+        requests[idRequest].price = msg.value;        
+    }
+
+    function SellFlat(uint idRequest)public payable{
+        require(requests[idRequest].owner == msg.sender,"You not owner");
+        require(requests[idRequest].saleTerm > nowMoment, "Application is not valid");
+        require(requests[idRequest].statusRequest == false, "Application closed");
+        require(requests[idRequest].statuseAnswer == true);
+        require(requests[idRequest].statusBuyer == true, "You has not buyer");
+        // require(bazaOwners[msg.sender][requests[idRequest].idFlat].statuseOwner == false, "You are no longer the owner of this apartment");
+
+        address buyer = requests[idRequest].buyer;
+
+        address owner = msg.sender;
+        uint idFlat = requests[idRequest].idFlat;
+        uint squer = bazaOwners[owner][idFlat].squer;
+        uint lifetime = bazaOwners[owner][idFlat].lifetime;
+        
+        payable(owner).transfer(requests[idRequest].price);
+
+        bazaOwners[buyer].push(flat(buyer,squer, lifetime, true));
+        bazaOwners[owner][idFlat].statuseOwner = false;
+        requests[idRequest].statusRequest = true;
+    }
+
+    function dpropRequest (uint idRequest)public payable{
+        require(requests[idRequest].owner == msg.sender,"You not owner");
+        require(requests[idRequest].statusRequest == false, "Application closed");
+        require(requests[idRequest].saleTerm > nowMoment, "Application is not valid");
+        if(requests[idRequest].statusBuyer == true){
+            payable(requests[idRequest].buyer).transfer(requests[idRequest].price);
+        }
+
+        requests[idRequest].statusRequest = true;
+    }
+
+    function answerOwner(uint idRequest, bool answer)public{
+        require(requests[idRequest].owner == msg.sender,"You not owner");
+        require(requests[idRequest].statusBuyer == true, "You has not buyer");
+
+        if(answer){
+            requests[idRequest].statuseAnswer = true;
+        }
+        else{
+            requests[idRequest].statusBuyer = false;
+            requests[idRequest].buyer = 0x0000000000000000000000000000000000000000;
+            payable(requests[idRequest].buyer).transfer(requests[idRequest].price);
+
+        }
+
+    }
+
+    function cancelRequest(uint idRequest) public {
+    require(requests[idRequest].saleTerm >= nowMoment, "Time is low");
+    require(requests[idRequest].buyer == msg.sender,"You not buyer");
+    require(requests[idRequest].statusRequest == false, "Application closed");
+    require(requests[idRequest].statuseAnswer == true, "Status is not true");
+   
+    uint priceCancel = requests[idRequest].price;
+
+    payable(msg.sender).transfer(priceCancel);
+}
+
+    
+
+    function showFlat(address owner) public view returns(flat[] memory){
+        return bazaOwners[owner];
+    }
+
+}
