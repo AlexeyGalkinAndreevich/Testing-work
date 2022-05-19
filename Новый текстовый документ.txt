@@ -9,6 +9,7 @@ contract Flats{
         uint squer;
         uint lifetime;
         bool statuseOwner;
+        bool statusRent;
 
     }
 
@@ -25,9 +26,20 @@ contract Flats{
 
     }
 
+
+
     struct Buyer{
         address buyer;
         uint priceBuyer;
+    }
+
+    struct present{
+        address owner;
+        uint idFlat;
+        uint timePresent;
+        bool statusePresent;
+        bool statuseAnswer;
+        address recipient;
     }
 
     address admin;
@@ -36,27 +48,32 @@ contract Flats{
 
     Request[]requests;
     Buyer[]massBuyer;
+    present[] presents;
+
 
     uint nowMoment = block.timestamp;
 
     constructor(){
 
         admin = 0x5B38Da6a701c568545dCfcB03FcB875f56beddC4;
-        bazaOwners[0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2].push(flat(0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2, 50, 7, true));
+        bazaOwners[0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2].push(flat(0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2, 50, 7, true, false));
         
                    
     }
 
+    //Создание запроса на продажу
     function CreateRequest(uint idFlat, uint price, uint TimeActual)public{
         require(bazaOwners[msg.sender].length > idFlat, "Error");
         requests.push(Request(msg.sender, idFlat, price, nowMoment + (TimeActual * 24 *60**2), false, 0x0000000000000000000000000000000000000000,false, false));
     }
 
+    //Добавление квартиры
     function AddFlat(address owner, uint squer,uint lifetime)public{
         require(msg.sender == admin, "You not admin");
-        bazaOwners[owner].push(flat(owner, squer, lifetime,true));
+        bazaOwners[owner].push(flat(owner, squer, lifetime,true,false));
     }
 
+    //Заявка на покупку квартиры
     function purchase (uint idRequest)public payable{
         require(msg.sender != requests[idRequest].owner, "you cannot sell the flat to yourself");
         require(requests[idRequest].statusRequest == false, "Application closed");
@@ -69,6 +86,7 @@ contract Flats{
         requests[idRequest].price = msg.value;        
     }
 
+    //Продажа квартиры
     function SellFlat(uint idRequest)public payable{
         require(requests[idRequest].owner == msg.sender,"You not owner");
         require(requests[idRequest].saleTerm > nowMoment, "Application is not valid");
@@ -86,11 +104,12 @@ contract Flats{
         
         payable(owner).transfer(requests[idRequest].price);
 
-        bazaOwners[buyer].push(flat(buyer,squer, lifetime, true));
+        bazaOwners[buyer].push(flat(buyer,squer, lifetime, true,false));
         bazaOwners[owner][idFlat].statuseOwner = false;
         requests[idRequest].statusRequest = true;
     }
 
+    //Отказ от продажи
     function dpropRequest (uint idRequest)public payable{
         require(requests[idRequest].owner == msg.sender,"You not owner");
         require(requests[idRequest].statusRequest == false, "Application closed");
@@ -102,6 +121,7 @@ contract Flats{
         requests[idRequest].statusRequest = true;
     }
 
+    //Соглашение пользлвателя 
     function answerOwner(uint idRequest, bool answer)public{
         require(requests[idRequest].owner == msg.sender,"You not owner");
         require(requests[idRequest].statusBuyer == true, "You has not buyer");
@@ -118,6 +138,7 @@ contract Flats{
 
     }
 
+    //Отмена покупки квартиры
     function cancelRequest(uint idRequest) public {
     require(requests[idRequest].saleTerm >= nowMoment, "Time is low");
     require(requests[idRequest].buyer == msg.sender,"You not buyer");
@@ -127,7 +148,45 @@ contract Flats{
     uint priceCancel = requests[idRequest].price;
 
     payable(msg.sender).transfer(priceCancel);
-}
+    }
+
+    function presentFlat(uint idFlat, uint timePresent,address recipient)public{
+
+        uint time = nowMoment + (timePresent * 24 *60**2);
+        
+        presents.push(present(msg.sender, idFlat, time, false,false,recipient));
+    }
+
+    //Ответ на подарок
+    function presentAnswer(uint idPresent, bool answer)public{
+
+        if(answer){
+            presents[idPresent].statusePresent = true;
+
+            address recipient = presents[idPresent].recipient;
+            address owner = presents[idPresent].owner;
+            uint idFlat = presents[idPresent].idFlat;
+            uint squer = bazaOwners[owner][idFlat].squer;
+            uint lifetime = bazaOwners[owner][idFlat].lifetime;
+
+            bazaOwners[recipient].push(flat(recipient,squer, lifetime, true,false));
+            bazaOwners[owner][idFlat].statuseOwner = false;
+            
+        }
+        else{
+            presents[idPresent].statusePresent = true;
+
+        }
+        presents[idPresent].statuseAnswer = true;
+    }
+
+    function dpropPresent(uint idPresent)public{
+        require(presents[idPresent].owner == msg.sender,"You not owner");
+        require(presents[idPresent].statusePresent == false,"Application closed");
+        require(presents[idPresent].statuseAnswer == false,"the recipient has already answered");
+
+        presents[idPresent].statusePresent = true;
+    }
 
     
 
@@ -136,3 +195,76 @@ contract Flats{
     }
 
 }
+
+contract arenda is Flats{
+
+    struct rent{
+        
+        address owner;
+        uint idFlat;
+        uint price;
+        uint term;
+        address user;
+        bool statuseUser;
+        bool statusRent;
+        bool statuseAnswer;
+    }
+
+    rent[] rents;
+
+    //Создание объявления об аренде
+    function creatRent(uint idFlat, uint price, uint term)public{
+        require(bazaOwners[msg.sender][idFlat].statuseOwner == true, "You not owner");
+        rents.push(rent(msg.sender, idFlat, price, term, 0x0000000000000000000000000000000000000000,false, false,false));
+    }
+
+    function requestRent(uint idRent)public payable{
+
+        require(msg.sender != rents[idRent].owner, "you cannot rent the flat to yourself");
+        require(rents[idRent].statusRent == false, "Application closed");
+
+        rents[idRent].statuseUser = true;
+        rents[idRent].user = msg.sender;
+        rents[idRent].price = msg.value; 
+
+    }
+
+    //Соглашение пользлвателя 
+    function answerUser(uint idRent, bool answer)public{
+        require(rents[idRent].owner == msg.sender,"You not owner");
+        require(rents[idRent].statuseUser == true, "You has not buyer");
+
+        if(answer){
+            rents[idRent].statuseAnswer = true;
+        }
+        else{
+            rents[idRent].statuseUser = false;
+            rents[idRent].user = 0x0000000000000000000000000000000000000000;
+            payable(rents[idRent].user).transfer(rents[idRent].price);
+
+        }
+
+    }
+
+    //Отказ от ареды
+    function dpropRent (uint idRent)public payable{
+        require(rents[idRent].owner == msg.sender,"You not owner");
+        require(rents[idRent].statusRent == false, "Application closed");
+        require(rents[idRent].term > nowMoment, "");
+        if(rents[idRent].statuseUser == true){
+            payable(rents[idRent].user).transfer(rents[idRent].price);
+        }
+
+        rents[idRent].statusRent = true;
+    }
+
+    //Отмена аренды квартиры
+    function cancelRent(uint idRent) public {
+    require(rents[idRent].user == msg.sender,"You not buyer");
+    require(rents[idRent].statusRent == false, "Application closed");
+    require(rents[idRent].statuseAnswer == true, "Status is not true");
+
+    payable(msg.sender).transfer(rents[idRent].price);
+    }
+}
+
