@@ -1,0 +1,132 @@
+-- create table owner(
+-- id_owner int primary key auto_increment,
+-- surname varchar(30) not null,
+-- name_owner varchar(30) not null,
+-- patronymic varchar(30),
+-- driver_license long not null,
+-- passport long not null,
+-- birthday date not null,
+-- address_owner varchar(70) not null
+-- );
+
+-- create table sotryd(
+-- id_sotryd int primary key auto_increment,
+-- surname varchar(30) not null,
+-- name_sotryd varchar(30) not null,
+-- patronymic varchar(30),
+-- passport long not null,
+-- id_post int not null,
+-- address varchar(70) not null,
+-- FOREIGN key(id_post) references post_sotryd(id_post)
+-- );
+
+-- create table post_sotryd(
+-- id_post int primary key auto_increment,
+-- name_post varchar(40)
+-- );
+
+-- create table registration(
+-- id_registration int primary key auto_increment,
+-- pts varchar(10) not null,
+-- gos_num varchar(6) not null,
+-- date_registration date not null,
+-- id_owner int not null,
+-- id_sotryd int not null,
+-- FOREIGN key(id_owner) references owner(id_owner),
+-- FOREIGN key(id_sotryd) references sotryd(id_sotryd)
+-- );
+
+-- create table avto(
+-- pts varchar(10) primary key not null,
+-- model varchar(20) not null,
+-- marka varchar(20) not null,
+-- year_release date not null
+-- );
+
+-- create table protokol(
+-- id_protokol int primary key auto_increment,
+-- pts varchar(10) not null,
+-- date_protokol date not null,
+-- id_shtraf int not null,
+-- id_sotryd int not null,
+-- fact_pay boolean not null,
+-- FOREIGN key(pts) references avto(pts),
+-- FOREIGN key(id_sotryd) references sotryd(id_sotryd),
+-- FOREIGN key(id_shtraf) references shtraf(id_shtraf)
+-- );
+
+-- create table shtraf(
+-- id_shtraf int primary key auto_increment,
+-- type_shtraf varchar(40) not null,
+-- price_shtraf int not null
+-- );
+
+-- alter table registration
+-- add foreign key (pts) references avto(pts);
+
+-- insert into owner(surname, name_owner, patronymic, driver_license, passport, birthday, address_owner) values(
+-- 'petrov', 'petr', 'petrovich', 7414292010, 1234567890, '1999-01-21', 'kaluga lenina 73 kv 8'
+-- );
+-- insert into owner(surname, name_owner, patronymic, driver_license, passport, birthday, address_owner) values(
+-- 'ivanov', 'ivan', 'ivanovich', 9845674832, 3489302819, '1990-07-16', 'moscow nicolskay 102 kv 30'
+-- );
+
+-- insert into shtraf(type_shtraf, price_shtraf) values(
+-- 'speeding in city', 500
+-- );
+-- insert into shtraf(type_shtraf, price_shtraf) values(
+-- 'did not miss a pedestrian', 1000
+-- );
+
+-- insert into post_sotryd(name_post) values(
+-- 'inspector'
+-- );
+-- insert into post_sotryd(name_post) values(
+-- 'senior inspector'
+-- );
+
+
+-- insert into avto values(
+-- '23gh678934','kia', 'crid 2020', '2020-04-30'
+-- );
+-- insert into avto values(
+-- '45jh985632','shkoda', 'yeti', '2018-09-15'
+-- );
+
+-- insert into registration(pts, gos_num, date_registration, id_owner, id_sotryd) values(
+-- '23gh678934','h666op', '2020-09-15', 1, 1
+-- );
+-- insert into sotryd(surname, name_sotryd, patronymic, passport, id_post, address) values(
+-- 'gavrilov', 'oleg', 'petrovich', 5698345687, 2, 'kaluga squaer pobedy 5 kv 17'
+-- );
+-- insert into sotryd(surname, name_sotryd, patronymic, passport, id_post, address) values(
+-- 'geroev', 'alexey', 'ivanov', 9845761234, 1, 'kaluga squaer pobedy 10 kv 17'
+-- );
+
+-- alter table registration
+-- change column gos_num
+-- gos_num varchar(6) ;
+
+-- insert into protokol(pts, date_protokol, id_shtraf, id_sotryd, fact_pay) values(
+-- '23gh678934', '2021-01-01', 1, 2, 2, 'kaluga squaer pobedy 5 kv 17'
+-- );
+-- insert into protokol(pts, date_protokol, id_shtraf, id_sotryd, fact_pay) values(
+-- '23gh678934', '2021-01-01', 1, 2, 0
+-- );
+-- select shtraf.type_shtraf, count(protokol.id_shtraf) from shtraf, protokol
+-- where shtraf.id_shtraf = protokol.id_shtraf;
+-- select owner.surname, count(protokol.id_shtraf) as kolvo from shtraf, protokol, registration, owner,avto 
+-- where shtraf.id_shtraf = protokol.id_shtraf and protokol.pts = registration.pts and avto.pts = registration.pts and registration.id_owner = owner.id_owner
+-- GROUP BY(owner.surname)
+-- order by count(protokol.id_shtraf) desc limit 5;
+
+-- update shtraf set price_shtraf = price_shtraf * 1.1
+-- where shtraf.id_shtraf < 3;
+-- select price_shtraf from shtraf;
+
+
+-- update owner set   address_owner = 'kaluga nicolskay 102 kv 30'
+-- where id_owner = 2 ;
+-- select address_owner from owner;
+
+-- select protokol. ;
