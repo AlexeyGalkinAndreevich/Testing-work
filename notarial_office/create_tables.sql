@@ -1,0 +1,32 @@
+-- create database notarial_office1;
+-- create table clients(
+-- id_client int primary key auto_increment,
+-- title varchar(30) not null,
+-- activity_category varchar(30) not null,
+-- address varchar(60) not null,
+-- phone varchar(11) not null
+-- );
+-- create table services(
+-- id_service int primary key auto_increment,
+-- title varchar(70) not null,
+-- description varchar(200) not null,
+-- price int default(0) check(price >0)
+-- );
+
+-- create table Services_rendered(
+-- id_transaction int not null,
+-- id_service int not null,
+-- amount int default(1) check(amount >= 1)
+-- );
+-- create table transactions(
+-- id_transaction int primary key auto_increment,
+-- id_client int not null,
+-- transaction_date date default(current_date())
+-- );
+
+-- alter table transactions
+-- add foreign key(id_client) references clients(id_client);
+-- alter table Services_rendered
+-- add foreign key(id_transaction) references transactions(id_transaction);
+-- alter table Services_rendered
+-- add foreign key(id_service) references services(id_service);
