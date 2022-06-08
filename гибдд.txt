@@ -149,7 +149,7 @@
 
 -- select shtraf.short_title, count(shtraf.short_title) from shtraf, protokol
 -- where shtraf.id_shtraf = protokol.id_shtraf
--- group by protokol.id_shtraf;
+-- group by protokol.id_shtraf;   и с с
 
 -- select owner.surname,owner.name_owner, count(protokol.id_shtraf) as kolvo from shtraf, protokol, registration, owner,avto 
 -- where shtraf.id_shtraf = protokol.id_shtraf and protokol.pts = registration.pts and avto.pts = registration.pts and registration.id_owner = owner.id_owner
@@ -158,7 +158,7 @@
 -- select * from protokol;
 -- select price from protokol;
 -- update protokol set price = price * 1.1
--- where id_shtraf < 100 and fact_pay = 0;
+-- where id_shtraf < 100 and fact_pay = 0;оргит нясн7ген   си  неео грелоьг мсзшопрр   с    
 -- select price from protokol;
 
 -- select sum(protokol.price) from shtraf, protokol, registration, owner,avto 
