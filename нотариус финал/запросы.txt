@@ -1,0 +1,145 @@
+-- транзакция на сумму между 2 и 5 тыс. (исп between + having)
+-- select clients.title, sum(services.price * services_rendered.amount) as summa_transaction from services_rendered,transactions,services, clients
+-- where services_rendered.id_transaction = transactions.id_transaction and  services_rendered.id_service = services.id_service and clients.id_client = transactions.id_client
+-- group by transactions.id_transaction having (summa_transaction  between 2000 and 5000);
+
+
+-- Самая дорогая покупка
+-- select clients.title, sum(services.price * services_rendered.amount) as summa_transaction from services_rendered,transactions,services, clients
+-- where services_rendered.id_transaction = transactions.id_transaction and  services_rendered.id_service = services.id_service and clients.id_client = transactions.id_client
+-- group by transactions.id_transaction
+-- order by summa_transaction desc limit 1;
+
+
+-- Поздапрос(какие услуги клиент не покупал)
+-- select services.title from services, services_rendered, transactions,clients
+-- where services_rendered.id_transaction = transactions.id_transaction and  services_rendered.id_service = services.id_service and clients.id_client = transactions.id_client
+-- and services.title  not in (select services.title from services, services_rendered, transactions,clients
+-- where services_rendered.id_transaction = transactions.id_transaction and  services_rendered.id_service = services.id_service
+-- and clients.id_client = transactions.id_client and clients.title = 'Ситилинк' )
+-- group by services_rendered.id_service;
+
+
+
+-- Вывести месяц когда клиент заказал больше всего услуг
+
+-- (select clients.title, monthname(transactions.transaction_date) month_transaction, sum(services_rendered.amount) amount_services  
+-- from  services, services_rendered, clients, transactions
+-- where services_rendered.id_transaction = transactions.id_transaction and  services_rendered.id_service = services.id_service
+-- and clients.id_client = transactions.id_client and year(transactions.transaction_date) = 2021 and clients.title = 'Пятерочка'
+-- group by month_transaction order by amount_services desc limit 1)
+-- union
+-- (select clients.title, monthname(transactions.transaction_date) month_transaction, sum(services_rendered.amount) amount_services  
+-- from  services, services_rendered, clients, transactions
+-- where services_rendered.id_transaction = transactions.id_transaction and  services_rendered.id_service = services.id_service
+-- and clients.id_client = transactions.id_client and year(transactions.transaction_date) = 2021 and clients.title = 'Ситилинк'
+-- group by month_transaction order by amount_services desc limit 1)
+
+-- Кто больше всего заказал услуг за опр. месяц
+-- (select clients.title, sum(services_rendered.amount) amount_services, month(transactions.transaction_date) month_transaction
+-- from  services, services_rendered, clients, transactions
+-- where services_rendered.id_transaction = transactions.id_transaction and  services_rendered.id_service = services.id_service
+-- and clients.id_client = transactions.id_client and year(transactions.transaction_date)  = 2021
+-- group by clients.id_client,  month_transaction having (month_transaction = 4) order by amount_services desc limit 1)
+-- union 
+-- (select clients.title, sum(services_rendered.amount) amount_services, month(transactions.transaction_date) month_transaction
+-- from  services, services_rendered, clients, transactions
+-- where services_rendered.id_transaction = transactions.id_transaction and  services_rendered.id_service = services.id_service
+-- and clients.id_client = transactions.id_client and year(transactions.transaction_date)  = 2021
+-- group by clients.id_client,  month_transaction having (month_transaction = 7) order by amount_services desc limit 1)
+
+
+-- Топ 5 самых популярных месецев(по кол-ву оказанных услуг)
+-- select monthname(transactions.transaction_date) month_transaction, sum(services_rendered.amount) amount_services,
+-- sum(services_rendered.amount * services.price) profit
+-- from transactions, services, services_rendered, clients
+-- where services_rendered.id_transaction = transactions.id_transaction and  services_rendered.id_service = services.id_service
+-- and clients.id_client = transactions.id_client and year(transactions.transaction_date) = 2021
+-- group by  month_transaction order by amount_services desc limit 5;
+-- select * from  services_rendered;
+
+-- количество услуг и их стоимость в одном чеке
+-- select clients.title, count(transactions.id_transaction) amount_services, sum(services.price * services_rendered.amount) sum_all_transaction from transactions, clients,services_rendered, services
+-- where clients.id_client = transactions.id_client and services_rendered.id_transaction = transactions.id_transaction and services.id_service = services_rendered.id_service
+-- group by transactions.id_transaction;
+
+-- количество транзакций и общая стоимоть этих транзакций
+-- select clients.title, count(transactions.id_client) amount_transactions, sum(services.price * services_rendered.amount) sum_all_transaction
+-- from transactions, clients,services_rendered, services
+-- where clients.id_client = transactions.id_client and services_rendered.id_transaction = transactions.id_transaction
+-- and services.id_service = services_rendered.id_service
+-- group by transactions.id_client;
+
+-- количество транзакций и общая стоимоть этих транзакций опр. клиентов
+-- select clients.title, count(transactions.id_client) amount_transactions, sum(services.price * services_rendered.amount) sum_all_transaction 
+-- from transactions, clients,services_rendered, services
+-- where clients.id_client = transactions.id_client and services_rendered.id_transaction = transactions.id_transaction and services.id_service = services_rendered.id_service
+-- and (clients.title = 'Ситилинк' or clients.title = 'Эльдорадо')
+-- group by transactions.id_client;
+
+--  список услуг по количеству их заказов(если они были заказаны хоть раз)
+-- select services.title, services_rendered.amount
+-- from services inner join services_rendered on services.id_service = services_rendered.id_service
+-- group by  services.title order by services_rendered.amount desc;
+
+
+--  список заказчиков по количеству купленных им услуг(если заказчик купил услугу хоть раз)
+-- select clients.title, sum(services_rendered.amount)
+-- from clients inner join transactions on clients.id_client = transactions.id_client, services_rendered
+-- where services_rendered.id_transaction = transactions.id_transaction 
+-- group by  clients.title order by sum(services_rendered.amount) desc;
+
+
+-- обновление цены относительно популярности товара
+
+-- SET SQL_SAFE_UPDATES=0;
+-- update services set services.price = services.price * 1.5
+-- where services.id_service in (
+-- 	select services_rendered.id_service  from services_rendered
+-- 	group by services_rendered.id_service
+-- 	having(sum(services_rendered.amount) between 
+-- 		(select sum(services_rendered.amount)  from services_rendered) * 0.3 
+-- 		and
+-- 		(select sum(services_rendered.amount) from services_rendered) * 0.5
+--     )
+-- );
+-- SET SQL_SAFE_UPDATES=1;
+
+-- SET SQL_SAFE_UPDATES=0;
+-- update services set services.price = services.price * 1.1
+-- where services.id_service in (
+-- 	select services_rendered.id_service from services_rendered
+-- 	group by services_rendered.id_service
+-- 	having(sum(services_rendered.amount) between 
+-- 		(select sum(services_rendered.amount)  from services_rendered) * 0.2
+-- 		and
+-- 		(select sum(services_rendered.amount) from services_rendered) * 0.3
+--     )
+-- );
+
+-- SET SQL_SAFE_UPDATES=1;
+
+-- SET SQL_SAFE_UPDATES=0;
+-- update services set services.price = services.price * 1.05
+-- where services.id_service in (
+-- 	select services_rendered.id_service  from services_rendered
+-- 	group by services_rendered.id_service
+-- 	having(sum(services_rendered.amount) between 
+-- 		(select sum(services_rendered.amount)  from services_rendered) * 0.1
+-- 		and
+-- 		(select sum(services_rendered.amount) from services_rendered) * 0.2
+--     )
+-- );
+
+-- SET SQL_SAFE_UPDATES=1;
+-- select * from services;
+
+-- SET SQL_SAFE_UPDATES=0;
+-- update services set services.price = services.price * 0.9
+-- where services.id_service in (
+-- 	select services_rendered.id_service  from services_rendered
+-- 	group by services_rendered.id_service  
+-- 	having(sum(services_rendered.amount) < (select sum(services_rendered.amount)  from services_rendered) * 0.1)
+-- );
+-- SET SQL_SAFE_UPDATES=1;
+-- select * from services;

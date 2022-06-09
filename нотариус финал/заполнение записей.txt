@@ -1,0 +1,40 @@
+-- insert into services(title, description, price) values
+-- ('Нотариальное заверение документов','Заверка подписи', 150),
+-- ('Выдача свидетельства о праве собственности','Выдача свидетельства о праве собственности', 200),
+-- ('Засвидетельствование перевода документов','Засвидетельствование перевода документов', 140),
+-- ('Прием на хранение документов','Прием на хранение документов', 350),
+-- ('Удостоверение договоров купли-продажи недвижимости','Удостоверение договоров купли-продажи недвижимости', 1500);
+
+-- insert into clients(title, activity_category,address, phone) values
+-- ('Эльдорадо', 'торговля','ул. Кирова, д. 39', '89345670125'),
+-- ('Ситилинк', 'торговля','ул. Дзержинского, д. 38', '81905674983'),
+-- ('BТБ', 'банк','ул. Ленина, д. 64', '89845730825'),
+-- ('Пятерочка', 'торговля',' ул. Силикатный пер., 27,', '86094571894');
+
+-- insert into transactions(id_client, transaction_date) values(4, 20210411),(3, 20210505),(2, 20210610),(1, 20210718);
+
+-- insert into services_rendered(id_transaction,id_service, amount) values
+-- (8,1,3),
+-- (8,2,5),
+-- (8,3,6),
+-- (8,4,4),
+-- (11,1,3),
+-- (11,2,4),
+-- (11,3,3),
+-- (11,4,5),
+-- (9,1,1),
+-- (10,1,2);
+-- insert into transactions(id_client, transaction_date) values(1, 20210110),(2, 20210315);
+-- insert into services_rendered(id_transaction,id_service, amount) values
+-- (5,5,1),
+-- (6,2,6),
+-- (6,3,4);
+-- insert into services(title, description, price) values
+-- ('Алиментное соглашение','Алиментное соглашение', 5000);
+-- insert into transactions(id_client, transaction_date) values(1, 20210203);
+-- insert into services_rendered(id_transaction,id_service, amount) values
+-- (7,5,1),
+-- (7,2,6),
+-- (7,3,4);
+-- insert into services_rendered(id_transaction,id_service, amount) values (8,11,1)
+-- insert into clients(title, activity_category,address, phone) values ('Калугапутьмаш', 'производство товаров', ' ул. Ленина, д. 23', '84842505100')
