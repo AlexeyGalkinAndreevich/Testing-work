@@ -1,0 +1,22 @@
+.asidebar{
+    max-width: 290px;
+    background-color: white;
+    
+}
+.LogOutBtn{
+    display: flex;
+    justify-content: center;
+    align-items:center;
+    gap: 21px;
+    border: none;
+    outline: none;
+    background-color: white;
+    color:#707C97;
+    font-size: 16px;
+    font-weight: 500;
+}
+.LogOutDiv{
+    padding-top: 316px;
+    padding-left: 32px;
+    padding-bottom: 51px;
+}

@@ -1,0 +1,32 @@
+.user{
+   display: grid; 
+   padding-top: 87px;
+   /* padding-left: 10px; */
+   align-items: center;
+   justify-content: center;
+   gap: 6px;
+}
+.userPhoto{
+    display: grid; 
+    align-items: center;
+    justify-content: center;
+    
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p{
+    padding: 0;
+    margin: 0;
+}
+.nameUser{
+font-size: 18px;
+    
+/* line-height: 21px; */
+font-weight: 600;
+padding-bottom: 90px;
+}
