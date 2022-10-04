@@ -1,0 +1,65 @@
+----1
+--select fio from prepodavatel
+--where kkaf in (select kkaf from kafedra where namekaf in('Иностранный язык'))
+
+----2
+--select fio from prepodavatel
+--where exists (select * from usuchenie where usuchenie.tabn = prepodavatel.tabn and chas>100 and ng=1)
+
+----3
+--select fio from prepodavatel
+--where exists (select * from usuchenie where usuchenie.tabn = prepodavatel.tabn and vidz in('practika'))
+
+----4
+--select np from predmet
+--where exists (select * from usuchenie where usuchenie.kp = predmet.kp and chas>100)
+
+----5
+--select fio from prepodavatel
+--where exists 
+--(select tabn from usuchenie,predmet where usuchenie.kp = predmet.kp and usuchenie.tabn=prepodavatel.tabn and np in('алгебра') and ng=1)
+
+----6
+--select ng,kol from gruppa
+--where exists (select ng from usuchenie where gruppa.ng=usuchenie.ng and tabn=1) 
+
+----7
+select fio  from prepodavatel 
+where exists (select tabn from usuchenie where usuchenie.tabn = prepodavatel.tabn)
+
+----8
+--select fio from student
+--where exists (select * from uspevaemost where uspevaemost.ns = student.ns and uspevaemost.ng = student.ng
+--and (ozenka=2 or ozenka=3))
+
+----9
+--select fio,pball from student 
+--where pball >= all(select pball from student)
+
+----10
+select fio from student where
+exists(
+select * from uspevaemost where uspevaemost.ns = student.ns and student.ng = uspevaemost.ng
+group by ng 
+having pball in (select min(pball) from student group by ng)
+)
+
+--select ng,ns from student
+--group by ns,ng
+--having pball=min(pball)
+
+--select fio,(select min(pball) from student
+--group by ng) from student
+
+--12
+
+--13
+
+select fio from prepodavatel
+where exists (select count(kp) from usuchenie where prepodavatel.tabn=usuchenie.tabn group by tabn
+having count(kp) <= all(select count(kp) from usuchenie group by tabn))
+
+--select min(pball) from student group by ng
+
+
+
