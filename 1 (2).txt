@@ -1,0 +1,28 @@
+--create table tovar(
+--id_tovar int primary key identity,
+--name_tovar varchar(60) not null,
+--price int not null
+--)
+
+--create table postavshik(
+--id_post int not null,
+--name_post varchar(40) not null,
+--id_tovar int not null,
+--primary key(id_post,id_tovar),
+--foreign key(id_tovar) references tovar(id_tovar)
+
+--)
+
+--create table postavka(
+--id_postavka int not null,
+--kolvo int not null,
+--id_post int not null,
+--id_tovar int not null,
+--name_operation varchar(40) check(name_operation in('in','out')) not null,
+--data_post date not null,
+--n_sklad_out int not null,
+--n_sklad_in int not null,
+--primary key(id_postavka,id_post,id_tovar),
+--foreign key(id_post,id_tovar) references postavshik(id_post,id_tovar),
+--check(n_sklad_out !=n_sklad_in)
+--)
