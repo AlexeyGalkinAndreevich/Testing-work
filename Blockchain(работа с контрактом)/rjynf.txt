@@ -1,0 +1,167 @@
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity 0.8.17 ;
+
+contract bank {
+
+    struct people{
+        string name;
+        uint balance;
+        bool admin;
+        uint password;
+    }
+
+      struct shablon{
+          string name;
+          uint sum;
+      }
+
+    struct aplication {
+        address owner;
+        address recipient;
+        bytes32 cod_word;
+        uint sum;
+        bool status;
+	    uint trys;
+    }
+    struct voice{
+        address candidate;
+        address[] voting;
+        bool status;
+
+    }
+
+    // Хранилище людей
+    mapping(address => people)users;
+    // people[] users;
+
+    // Категории
+    mapping(string => shablon[])categories;
+
+    aplication[] aplications;
+    voice[] public voices;
+
+    uint count_admin;
+    constructor(){
+        address adr_admin_1 = 0x3Fb9484C50532527e7cF9A35082427b6F54d5873;
+        address adr_admin_2 = 0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2;
+        count_admin = 2;
+
+        address adr_user_1 = 0x4B20993Bc481177ec7E8f571ceCaE8A9e22C02db;
+        address adr_user_2  = 0x78731D3Ca6b7E34aC0F824c42a7cC18A495cabaB;
+        address adr_user_3  = 0x617F2E2fD72FD9D5503197092aC168c91465E7f2;
+        address adr_user_4 = 0x17F6AD8Ef982297579C203069C1DbfFE4348c372;
+
+        users[adr_admin_1] = (people("Alexey", 1000,true,11));
+        users[adr_admin_2] = (people("Roma", 1000,true,12 ));
+
+        users[adr_user_1] = (people("Jonh", 1000,false, 13 ));
+        users[adr_user_2] = (people("Andrev", 1000,false, 14 ));
+        users[adr_user_3] = (people("Max", 1000,false, 14 ));
+        users[adr_user_4] = (people("Kate", 1000,false,143 ));
+
+    }
+
+    function reg(address your_add, uint your_pass)public{
+            require(your_add == msg.sender, "you its not you");
+            require(users[your_add].password == your_pass, "ne tot pass");
+    }
+
+    // Оформление перевода
+    function translation_formation (address login, uint sum, string memory cod_word) public payable{
+        // require(users[msg.sender].balance > 0);
+        // require(users[msg.sender].balance >= sum);
+        require(msg.value == sum, "111111111111111111111111");
+        require(msg.sender != login);
+        //users[msg.sender].balance = users[msg.sender].balance - sum;
+        aplications.push(aplication(msg.sender, login, keccak256(abi.encode(cod_word)),sum, false, 0));
+    }
+
+    // Принятие перевода
+
+    function acceptance_of_translation(uint id_aplication, string memory cod_word) public{
+        require(id_aplication <= aplications.length, "Not found aplication");
+        require(aplications[id_aplication].recipient == msg.sender , "You are not recipient");
+        require(msg.sender != aplications[id_aplication].owner);
+        require(aplications[id_aplication].status != true, "aplication is nor working");
+        require(aplications[id_aplication].trys <= 2, "trys are run out");
+
+        if(keccak256(abi.encode(cod_word)) != aplications[id_aplication].cod_word){
+            require(aplications[id_aplication].trys != 2, "trys are run out");
+            users[aplications[id_aplication].owner].balance = users[aplications[id_aplication].owner].balance + aplications[id_aplication].sum;
+            aplications[id_aplication].trys += 1;
+
+            if(aplications[id_aplication].trys == 2){
+                payable(aplications[id_aplication].owner).transfer(aplications[id_aplication].sum);
+            }
+            return;
+        }
+
+        users[msg.sender].balance = users[msg.sender].balance + aplications[id_aplication].sum;
+        payable(msg.sender).transfer(aplications[id_aplication].sum);//
+
+        aplications[id_aplication].status = true;
+    }
+
+    // Отмена перевода
+
+    function canceling_a_transfer (uint id_aplication) public{
+        require(msg.sender == aplications[id_aplication].owner, "You are not owner");
+        require(aplications[id_aplication].status != true);
+
+        if(aplications[id_aplication].status != true){
+            return;
+        }
+
+        users[msg.sender].balance = users[msg.sender].balance + aplications[id_aplication].sum;
+
+        payable(msg.sender).transfer(aplications[id_aplication].sum);//
+    }
+
+    function view_aplications() public view returns(aplication[] memory){
+        return aplications;
+    }
+
+    function view_people(address _address) public view returns(people memory){
+        return users[_address];
+    }
+
+    function createVoid(address candidate)public{
+        require (users[msg.sender].admin == true,"You not admin");
+        voices[voices.length].voting.push(msg.sender);
+        voices[voices.length].candidate=candidate;
+        voices[voices.length].status = false;
+    }
+    function give_voice(uint id_voices, bool status_answer)public{
+        require(id_voices < voices.length,"");
+        require(voices[id_voices].status == false,"");
+        require (users[msg.sender].admin == true,"You not admin");
+        for(uint i=0; i<voices[id_voices].voting.length;i++){
+            if(msg.sender == voices[id_voices].voting[i]){
+            }
+        }
+        if(status_answer== true){
+           voices[id_voices].voting.push(msg.sender);
+
+           if(voices[id_voices].voting.length == count_admin){
+               add_admin(voices[id_voices].candidate);
+               voices[id_voices].status=true;
+           }
+           return;
+
+        }
+        voices[id_voices].status=true;
+        
+
+    } 
+    function add_admin(address user) private{
+        users[user].admin = true;
+    }
+
+    // function view_all_people() public view returns(people[] memory){
+    //     return users;
+    // }
+    function giveNum() public view returns(string memory) {
+        return '5';
+    }
+
+}
