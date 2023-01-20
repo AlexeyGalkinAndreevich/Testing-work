@@ -1,0 +1,16 @@
+.player{
+    position: absolute;
+}
+
+
+.ball{
+    position: absolute;
+    /* left:100px; */
+    border-radius: 50%;
+}
+
+/* .game-field{
+    position: relative;
+    top: 50px;
+    left:50px
+} */
