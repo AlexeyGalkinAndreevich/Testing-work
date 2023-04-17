@@ -1,80 +1,110 @@
 
+class Player{
+    constructor(){
+        this.width = 100,
+        this.height = 20,
+        this.x = 300,
+        this.y = 300,
+        this.maxX = 400,
+        this.maxY = 400,
+        this.minX = 200,
+        this.minY = 200,
+        this.colorObj = "red",
+        this.element = document.querySelector(".player")
+    }
+    onClick(e){
+        switch(e.code){
+            
+            case "ArrowUp":
+                this.y = this.y - 5
+                break
+            case "ArrowDown":
+                this.y = this.y + 5
+                break
+            case "ArrowLeft":
+                this.x = this.x - 5
+                break
+            case "ArrowRight":
+                player.x = player.x + 5
+                break
+        }
+    }
+    updateLocation(){
+        console.log(this.y);
+        if(this.x>this.maxX)this.x=this.maxX
+        if(this.x<this.minX)this.x=this.minX
+        if(this.y>this.maxY)this.y=this.maxY
+        if(this.y<this.minY)this.y=this.minY
+        this.element.style.left = this.x +'px'
+        this.element.style.top = this.y +'px'
+    }
+    updateSize(){
+        this.element.style.width = this.width +'px'
+        this.element.style.height = this.height +'px'
+        this.element.style.backgroundColor = this.colorObj
+        // colorPlayer
+    }
 
 
-let player = {
-    width:100,
-    height:20,
-    x:300,
-    y:300,
-    maxX:400,
-    maxY:400,
-    minX:200,
-    minY:200,
-    colorObj:"red",
-    element:document.querySelector(".player")
+
+
 }
 
-
-let ball = {
-    width:20,
-    height:20,
-    x:350,
-    y:150,
-    maxX:400,
-    maxY:400,
-    minX:200,
-    minY:200,
-    colorObj:"green",
-    element:document.querySelector(".ball")
+class Ball{
+    constructor(){
+        this.width = 20,
+        this.height = 20,
+        this.x = 350,
+        this.y = 150,
+        this.maxX = 400,
+        this.maxY = 400,
+        this.minX = 200,
+        this.minY = 200,
+        this.colorObj = "green",
+        this.element = document.querySelector(".ball")
+    }
+    updateLocation(){
+        if(this.x>this.maxX)this.x=this.maxX
+        if(this.x<this.minX)this.x=this.minX
+        if(this.y>this.maxY)this.y=this.maxY
+        if(this.y<this.minY)this.y=this.minY
+        this.element.style.left = this.x +'px'
+        this.element.style.top = this.y +'px'
+    }
+    updateSize(){
+        this.element.style.width = this.width +'px'
+        this.element.style.height = this.height +'px'
+        this.element.style.backgroundColor = this.colorObj
+        // colorPlayer
+    }
+    ballDown(){
+        console.log(this.y);
+        this.y = this.y-5
+        // console.log(this.y);
+        this.updateLocation()
+    }
+    
 }
 
-function ballDown(obj){
-    obj.y = obj.y-5
-    updateLocation(obj)
-}
+const player = new Player()
+const ball = new Ball()
+
+
 setInterval(()=>{
-    console.log(1);
-    ballDown(ball)
+    ball.ballDown()
 },500)
 
-updateLocation(player)
-updateLocation(ball)
+player.updateLocation()
+ball.updateLocation()
+
 
 document.body.addEventListener("keydown",(e)=>{
-    switch(e.code){
-            
-        case "ArrowUp":
-            player.y = player.y - 5
-            break
-        case "ArrowDown":
-            player.y = player.y + 5
-            break
-        case "ArrowLeft":
-            player.x = player.x - 5
-            break
-        case "ArrowRight":
-            player.x = player.x + 5
-            break
-    }
-    updateLocation(player)
+    player.onClick(e)
+    player.updateLocation()
         
 })
 
-function updateLocation(obj){
-    if(obj.x>obj.maxX)obj.x=obj.maxX
-    if(obj.x<obj.minX)obj.x=obj.minX
-    if(obj.y>obj.maxY)obj.y=obj.maxY
-    if(obj.y<obj.minY)obj.y=obj.minY
-    obj.element.style.left = obj.x +'px'
-    obj.element.style.top = obj.y +'px'
-}
 
-function updateSize(obj){
-    console.log(obj);
-    obj.element.style.width = obj.width +'px'
-    obj.element.style.height = obj.height +'px'
-    obj.element.style.backgroundColor = obj.colorObj
-    // colorPlayer
-}
-updateSize(player)
-updateSize(ball)
+
+player.updateSize()
+ball.updateSize()
