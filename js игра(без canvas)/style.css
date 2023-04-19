@@ -1,6 +1,8 @@
-.player{
+.player1, 
+.player2{
     position: absolute;
 }
+
 
 
 .ball{
